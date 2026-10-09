@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Defect Classifier</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand-mark" aria-hidden="true">DF</div>
+      <div>
+        <p class="eyebrow">Visual inspection workspace</p>
+        <h1>Defect Classifier</h1>
+      </div>
+      <div class="status"><span></span> API ready</div>
+    </header>
+
+    <section class="intro">
+      <div>
+        <p class="eyebrow">Zero-shot analysis</p>
+        <h2>Inspect a surface.<br><em>Find the signal.</em></h2>
+      </div>
+      <p class="intro-copy">Upload an image and select the conditions you want the model to compare. Results are ranked by visual similarity.</p>
+    </section>
+
+    <form id="classifier-form" class="workspace">
+      <section class="panel upload-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="step">01</p>
+            <h3>Evidence image</h3>
+          </div>
+          <span class="file-type">JPG / PNG</span>
+        </div>
+        <label class="dropzone" id="dropzone" for="image-input">
+          <input id="image-input" name="image" type="file" accept="image/png,image/jpeg,image/webp" required>
+          <div class="upload-icon" aria-hidden="true">+</div>
+          <strong id="upload-title">Drop an image here</strong>
+          <span id="upload-hint">or click to browse from your device</span>
+          <img id="preview" alt="Selected image preview">
+        </label>
+        <p class="selected-file" id="selected-file">No image selected</p>
+      </section>
+
+      <section class="panel labels-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="step">02</p>
+            <h3>Comparison labels</h3>
+          </div>
+          <button class="text-button" type="button" id="select-all">Select all</button>
+        </div>
+        <p class="helper">Choose at least two possible conditions to compare.</p>
+        <div class="label-list" id="label-list">
+          <label class="label-option"><input type="checkbox" name="label" value="corroded metal surface" checked><span class="checkmark">✓</span><span>Corroded metal surface</span></label>
+          <label class="label-option"><input type="checkbox" name="label" value="clean undamaged metal surface" checked><span class="checkmark">✓</span><span>Clean undamaged metal surface</span></label>
+          <label class="label-option"><input type="checkbox" name="label" value="weld defect" checked><span class="checkmark">✓</span><span>Weld defect</span></label>
+          <label class="label-option"><input type="checkbox" name="label" value="crack in hull plating" checked><span class="checkmark">✓</span><span>Crack in hull plating</span></label>
+        </div>
+        <div class="custom-label">
+          <input id="custom-label" type="text" maxlength="80" placeholder="Add a custom label...">
+          <button type="button" id="add-label" aria-label="Add custom label">+</button>
+        </div>
+        <button class="analyze-button" type="submit" id="analyze-button"><span>Analyze image</span><span aria-hidden="true">↗</span></button>
+        <p class="form-message" id="form-message" role="alert"></p>
+      </section>
+    </form>
+
+    <section class="results-section" id="results-section" aria-live="polite">
+      <div class="results-heading">
+        <div><p class="step">03</p><h3>Prediction results</h3></div>
+        <span id="result-meta">Waiting for an image</span>
+      </div>
+      <div class="results-empty" id="results-empty"><span>03</span><p>Your ranked predictions will appear here after analysis.</p></div>
+      <div class="results-list" id="results-list"></div>
+    </section>
+
+    <section class="lower-grid">
+      <section class="panel feedback-panel">
+        <div class="panel-heading">
+          <div><p class="step">04</p><h3>Review prediction</h3></div>
+          <span class="file-type">FEEDBACK</span>
+        </div>
+        <p class="helper">Tell us whether the result matches your inspection. A prediction must be run first.</p>
+        <div class="rating-group" role="group" aria-label="Prediction rating">
+          <button class="rating-button" type="button" data-rating="1" disabled><span aria-hidden="true">+</span> Helpful</button>
+          <button class="rating-button" type="button" data-rating="0" disabled><span aria-hidden="true">~</span> Unsure</button>
+          <button class="rating-button" type="button" data-rating="-1" disabled><span aria-hidden="true">-</span> Incorrect</button>
+        </div>
+        <textarea id="feedback-comment" rows="3" maxlength="500" placeholder="Optional note about this prediction..." disabled></textarea>
+        <button class="secondary-button" type="button" id="submit-feedback" disabled>Send feedback <span aria-hidden="true">↗</span></button>
+        <p class="form-message" id="feedback-message" role="status"></p>
+      </section>
+
+      <section class="panel metrics-panel">
+        <div class="panel-heading">
+          <div><p class="step">05</p><h3>Service metrics</h3></div>
+          <button class="text-button" type="button" id="refresh-metrics">Refresh</button>
+        </div>
+        <p class="helper">Live counters from the Prometheus metrics endpoint.</p>
+        <div class="metric-grid" id="metric-grid">
+          <div class="metric-card"><span>Requests</span><strong id="metric-requests">--</strong></div>
+          <div class="metric-card"><span>Errors</span><strong id="metric-errors">--</strong></div>
+          <div class="metric-card"><span>Avg latency</span><strong id="metric-latency">--</strong></div>
+          <div class="metric-card"><span>Estimated cost</span><strong id="metric-cost">--</strong></div>
+        </div>
+        <p class="metrics-status" id="metrics-status">Loading metrics...</p>
+      </section>
+    </section>
+  </main>
+  <script src="/static/app.js"></script>
+</body>
+</html>
